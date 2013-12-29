@@ -160,30 +160,24 @@ pub mod native {
     use option::{Option, Some, None};
     use ptr;
     use tls = rt::thread_local_storage;
-    use unstable::mutex::{Mutex, MUTEX_INIT};
+    use unstable::mutex::{Once, ONCE_INIT};
 
-    static mut LOCK: Mutex = MUTEX_INIT;
-    static mut INITIALIZED: bool = false;
     static mut RT_TLS_KEY: tls::Key = -1;
+    static mut INIT: Once = ONCE_INIT;
 
     /// Initialize the TLS key. Other ops will fail if this isn't executed
     /// first.
     pub fn init() {
         unsafe {
-            LOCK.lock();
-            if !INITIALIZED {
+            INIT.doit(|| {
                 tls::create(&mut RT_TLS_KEY);
-                INITIALIZED = true;
-            }
-            LOCK.unlock();
+            });
         }
     }
 
     pub unsafe fn cleanup() {
-        rtassert!(INITIALIZED);
+        rtassert!(RT_TLS_KEY != -1);
         tls::destroy(RT_TLS_KEY);
-        LOCK.destroy();
-        INITIALIZED = false;
     }
 
     /// Give a pointer to thread-local storage.
