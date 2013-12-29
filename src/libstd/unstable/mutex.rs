@@ -287,7 +287,7 @@ mod imp {
 
     pub unsafe fn wait(cond: *c_void, m: *c_void) {
         unlock(m);
-        WaitForSingleObject(cond as HANDLE, 0);
+        WaitForSingleObject(cond as HANDLE, libc::INFINITE);
         lock(m);
     }
 
@@ -417,6 +417,8 @@ impl Once {
 
 #[cfg(test)]
 mod test {
+    use prelude::*;
+
     use rt::thread::Thread;
     use super::{ONCE_INIT, Once, Mutex, MUTEX_INIT};
     use task;

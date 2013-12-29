@@ -50,7 +50,7 @@ impl Local<local_ptr::Borrowed<Task>> for Task {
 
 #[cfg(test)]
 mod test {
-    use option::None;
+    use option::{None, Option};
     use unstable::run_in_bare_thread;
     use super::*;
     use rt::task::Task;
@@ -117,7 +117,8 @@ mod test {
             Local::put(task);
 
             let t: ~Task = Local::try_take().unwrap();
-            assert!(Local::try_take().is_none());
+            let o: Option<~Task> = Local::try_take();
+            assert!(o.is_none());
 
             cleanup_task(t);
         }

@@ -47,3 +47,7 @@ pub fn wait_for_other_tasks() {
         TASK_LOCK.unlock();
     }
 }
+
+pub fn cleanup() {
+    unsafe { TASK_LOCK.destroy(); }
+}

@@ -34,7 +34,7 @@ pub mod io;
 pub mod task;
 
 // XXX: this should not exist here
-#[cfg(stage0)]
+#[cfg(stage0, lolwut)]
 #[lang = "start"]
 pub fn lang_start(main: *u8, argc: int, argv: **u8) -> int {
     use std::cast;
@@ -72,7 +72,10 @@ pub fn start(argc: int, argv: **u8, main: proc()) -> int {
     task::new().run(|| {
         exit_code = Some(run(main.take_unwrap()));
     });
-    unsafe { rt::cleanup(); }
+    unsafe {
+        rt::cleanup();
+        bookeeping::cleanup();
+    }
     return exit_code.unwrap();
 }
 
