@@ -194,7 +194,7 @@ an error the task will fail.
 If you wanted to handle the error though you might write
 
     let mut error = None;
-    do io_error::cond(|e: IoError| {
+    do io_error::cond.trap(|e: IoError| {
         error = Some(e);
     }).in {
         File::new("diary.txt").write_line("met a girl");
@@ -498,10 +498,16 @@ pub trait Reader {
     ///
     /// # Example
     ///
-    ///     let mut reader = BufferedReader::new(File::open(&Path::new("foo.txt")));
-    ///     for line in reader.lines() {
-    ///         println(line);
-    ///     }
+    /// ```rust
+    /// use std::io::buffered::BufferedReader;
+    /// use std::io::File;
+    /// # let _g = ::std::io::ignore_io_error();
+    ///
+    /// let mut reader = BufferedReader::new(File::open(&Path::new("foo.txt")));
+    /// println(reader.read_line().unwrap_or(~"Expected at least one line."));
+    ///
+    /// if reader.eof() { println("The file is only one line long."); }
+    /// ```
     ///
     /// # Failure
     ///
@@ -1056,6 +1062,18 @@ pub trait Buffer: Reader {
     /// Reads the next line of input, interpreted as a sequence of utf-8
     /// encoded unicode codepoints. If a newline is encountered, then the
     /// newline is contained in the returned string.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use std::io::buffered::BufferedReader;
+    /// use std::io::stdin;
+    /// # let _g = ::std::io::ignore_io_error();
+    ///
+    /// let mut reader = BufferedReader::new(std::io::stdin());
+    ///
+    /// let input = reader.read_line().unwrap_or(~"nothing");
+    /// ```
     ///
     /// # Failure
     ///
